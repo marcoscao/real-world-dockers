@@ -6,7 +6,7 @@ before install:
   - docker build -t mscao/react-test -f ./client/Dockerfile.dev ./client
 
 script:
-  - docker run CI=true mscao/react-test npm test -- --coverage
+  - docker run -e CI=true mscao/react-test npm test -- --coverage
 
 after_success:
   - docker build -t mscao/multi-client ./client
