@@ -1,0 +1,22 @@
+sudo: required
+services:
+  - docker
+
+before install:
+  - docker build -t mscao/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run CI=true mscao/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t mscao/multi-client ./client
+  - docker build -t mscao/multi-nginx ./nginx
+  - docker build -t mscao/multi-server ./server
+  - docker build -t mscao/multi-worker ./worker
+  # Login in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --pasword-stdin
+  # Take those images and put them to docker hub
+  - docker push mscao/multi-client
+  - docker push mscao/multi-nginx
+  - docker push mscao/multi-server
+  - docker push mscao/multi-worker
